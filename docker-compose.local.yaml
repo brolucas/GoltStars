@@ -1,0 +1,75 @@
+services:
+  mariadb:
+    image: mariadb:11.3
+    container_name: mariadb_local
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: goltstars
+      MARIADB_USER: symfony
+      MARIADB_PASSWORD: symfony
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - GoltStars_network
+  phpMyAdmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin_local
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: symfony
+      PMA_PASSWORD: symfony
+    depends_on:
+      - mariadb
+    networks:
+      - GoltStars_network
+
+  react_goltstars:
+    build:
+      context: .
+      dockerfile: docker/Dockerfiles/React/Dockerfile_React
+    container_name: react_goltstars_local
+    volumes:
+      - ./GoltStars/front_end:/app/GoltStars/front_end/
+      - react_node_modules:/app/GoltStars/front_end/GoltStars_front_app/node_modules
+    ports:
+      - "3000:3000"
+    networks:
+      - GoltStars_network
+
+  symfony_goltstars:
+    build:
+      context: .
+      dockerfile: docker/Dockerfiles/Symfony/Dockerfile_Symfony
+    container_name: symfony_goltstars_local
+    volumes:
+      - ./GoltStars/back_end:/var/www/html/GoltStars/back_end
+    expose:
+      - "9000"
+    networks:
+      - GoltStars_network
+  nginx_goltstars:
+    build:
+      context: .
+      dockerfile: docker/Dockerfiles/Nginx/Dockerfile_Nginx
+    container_name: nginx_goltstars_local
+    volumes:
+      - ./GoltStars/back_end:/var/www/html/GoltStars/back_end
+      #- react_node_modules:/app/GoltStars/front_end/GoltStars_front_app/node_modules
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - symfony_goltstars
+      - react_goltstars
+    networks:
+      - GoltStars_network
+volumes:
+  react_node_modules:
+  mariadb_data:
+networks:
+  GoltStars_network:
+    driver: bridge

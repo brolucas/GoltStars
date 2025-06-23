@@ -1,0 +1,12 @@
+FROM node:20-alpine
+
+ENV APP_DIR=/app
+ENV TZ=Europe/Paris
+
+WORKDIR ${APP_DIR}/GoltStars/front_end
+
+#COPY ./portfolio/front_end/portfolio_front_app/package.json .
+
+#RUN npm install
+
+CMD ["tail", "-f", "/dev/null"]
