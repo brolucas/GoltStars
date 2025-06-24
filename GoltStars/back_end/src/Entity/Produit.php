@@ -7,9 +7,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
-#[ORM\Column(type: 'integer')]
 class Produit
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -17,7 +19,8 @@ class Produit
 
     #[ORM\Column(type: 'float')]
     private float $prix;
-    #[ORM\Column(type:'string', length : 255)]
+
+    #[ORM\Column(type:'string', length: 255)]
     private string $url;
 
     /**
@@ -26,11 +29,8 @@ class Produit
     #[ORM\ManyToMany(targetEntity: Categorie::class, inversedBy: 'produits')]
     private Collection $categories;
 
-    public function __construct(string $nom, float $prix, string $url)
+    public function __construct()
     {
-        $this->nom = $nom;
-        $this->prix = $prix;
-        $this->url = $url;
         $this->categories = new ArrayCollection();
     }
 
