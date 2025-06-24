@@ -9,7 +9,6 @@ use ApiPlatform\Core\Annotation\ApiResource;
 
 #[ApiResource]
 #[ORM\Entity]
-#[ORM\Column(type: 'integer')]
 class Categorie
 {
     #[ORM\Id]
@@ -23,9 +22,8 @@ class Categorie
     #[ORM\ManyToMany(targetEntity: Produit::class, mappedBy: 'categories')]
     private Collection $produits;
 
-    public function __construct(string $nom)
+    public function __construct()
     {
-        $this->nom = $nom;
         $this->produits = new ArrayCollection();
     }
 
