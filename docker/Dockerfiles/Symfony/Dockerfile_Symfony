@@ -19,29 +19,29 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 ## On télécharge le binaire de Symfony CLI puis on le déplace de son emplacement temporaire dans le conteneur vers '/usr/local/bin/symfony'
 ## Enfin, on supprime le dossier temporaire '/root/.symfony*'
-#RUN curl -sS https://get.symfony.com/cli/installer | bash && \
-#    mv /root/.symfony*/bin/symfony /usr/local/bin/symfony && \
-#    rm -rf /root/.symfony*
+RUN curl -sS https://get.symfony.com/cli/installer | bash && \
+    mv /root/.symfony*/bin/symfony /usr/local/bin/symfony && \
+    rm -rf /root/.symfony*
 
 ## Copie du fichier composer.json du projet pour installer la liste des dépendances nécessaires avec la commande composer install
-#COPY ./GoltStars/back_end/composer.json .
+COPY ./GoltStars/back_end/composer.json .
 
-#RUN composer install
+RUN composer install
 
-## Copie du projet symfony dans '/var/www/html/portfolio/back_end'
-#COPY ./GoltStars/back_end .
+## Copie du projet symfony dans '/var/www/html/GoltStars/back_end'
+COPY ./GoltStars/back_end .
 
 ## Permet d'installer et de configurer les dépendances JavaScript
-#RUN php bin/console c:install
+#RUN php bin/console importmap:install
 
 ## Supprime le cache de symfony
-#RUN php bin/console cache:clear
+RUN php bin/console cache:clear
 
 ## Génération du certificat TLS local afin de pouvoir se connecter en HTTPS
-#RUN symfony server:ca:install
+RUN symfony server:ca:install
 
 ## Lance PHP-FPM
-#CMD ["php-fpm"]
+CMD ["php-fpm"]
 
 ## Ci-dessous, commande pour lancer un conteneur et le laisser actif
-CMD ["tail", "-f", "/dev/null"]
+#CMD ["tail", "-f", "/dev/null"]
