@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
+#[ORM\Column(type: 'integer')]
 class Produit
 {
     private ?int $id = null;
@@ -16,7 +17,6 @@ class Produit
 
     #[ORM\Column(type: 'float')]
     private float $prix;
-
     #[ORM\Column(type:'string', length : 255)]
     private string $url;
 
