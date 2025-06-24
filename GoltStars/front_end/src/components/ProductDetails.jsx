@@ -18,7 +18,7 @@ export default function ProductDetails() {
           src={product.image}
           className="card-img-top"
           alt={product.name}
-          style={{ maxHeight: "300px", objectFit: "cover" }}
+          style={{ maxHeight: "500PX", objectFit: "cover" }}
         />
         <div className="card-body">
           <h3 className="card-title">{product.name}</h3>
