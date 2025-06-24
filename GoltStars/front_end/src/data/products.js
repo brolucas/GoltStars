@@ -3,7 +3,6 @@ export const products = [
     id: 1,
     name: "Maillot signé - Zinedine Zidane",
     price: 250,
-    quantity: 2,
     image: "/images/Zinedine_Zidane.png",
     categories: ["football", "collector", "français"],
     description: "Zizou. Le roi. Le mythe. À accrocher dans ton salon ou dans ton cœur.",
@@ -12,7 +11,7 @@ export const products = [
     id: 2,
     name: "Carte Légendaire - Sadio Mané",
     price: 180,
-    quantity: 4,
+
     image: "/images/mané.png",
     categories: ["football", "africain"],
     description: "Le lion de la Teranga rugit encore. Une carte rare pleine de puissance.",
@@ -21,7 +20,7 @@ export const products = [
     id: 3,
     name: "Édition Collector - Marquinhos LDC",
     price: 95,
-    quantity: 3,
+
     image: "/images/marquinhos.png",
     categories: ["basketball", "football", "psg"],
     description: "Pour les amoureux du PSG (et du beau jeu). Collector Ligue des Champions.",
@@ -30,7 +29,6 @@ export const products = [
     id: 4,
     name: "Carte Panini - Shai Gilgeous-Alexander",
     price: 120,
-    quantity: 7,
     image: "/images/Shai_Gileous_Alexander.png",
     categories: ["basketball", "canadien"],
     description: "Swag, skills & shoot. Le futur du basket dans ta poche.",

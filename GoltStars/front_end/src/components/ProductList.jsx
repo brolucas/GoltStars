@@ -37,6 +37,13 @@ export default function ProductList() {
   return (
     <div className="container py-5">
       {/* Intro */}
+       <button
+                    className="btn btn-outline-primary"
+                    onClick={() => navigate(`/admin/create`)}
+                    style={{ position: "absolute", top: "20px", right: "20px" }}
+                  >
+                   Administrateur
+                  </button>
       {/* SECTION HERO / INTRO */}
       <section className="text-center mb-5">
         <h1 className="display-4 fw-bold">✨ GoltStars – Le prestige sportif</h1>
@@ -92,7 +99,8 @@ export default function ProductList() {
               <div
                 className="position-relative"
                 style={{
-                  height: "100%",
+                  height: "500PX",
+                  width: "100%",
                   overflow: "hidden",
                   borderTopLeftRadius: "0.5rem",
                   borderTopRightRadius: "0.5rem",
@@ -112,7 +120,7 @@ export default function ProductList() {
                 </p>
                 <p className="text-center text-muted mb-2">
                   <strong>Prix :</strong> {product.price} €<br />
-                  <strong>Stock :</strong> {product.quantity}
+                  
                 </p>
                 <div className="d-grid mt-auto">
                   <button
@@ -120,6 +128,12 @@ export default function ProductList() {
                     onClick={() => navigate(`/produit/${product.id}`)}
                   >
                     Voir le produit
+                  </button>
+                  <button 
+                    className="btn btn-outline-secondary mt-2"
+                    onClick={() => navigate(`/admin/edit/${product.id}`)}
+                    >
+                     ✏️ Modifier
                   </button>
                 </div>
               </div>

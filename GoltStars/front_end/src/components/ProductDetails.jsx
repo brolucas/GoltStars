@@ -10,7 +10,7 @@ export default function ProductDetails() {
 
   return (
     <div className="container py-5">
-      <button className="btn btn-secondary mb-4" onClick={() => navigate(-1)}>
+      <button className="btn btn-secondary mb-4" onClick={() => navigate("/")}>
         ← Retour
       </button>
 
@@ -19,7 +19,7 @@ export default function ProductDetails() {
         <div
           className="position-relative"
           style={{
-            height: "400px",
+            height: "100%",
             overflow: "hidden",
             borderTopLeftRadius: "0.5rem",
             borderTopRightRadius: "0.5rem",
@@ -58,9 +58,7 @@ export default function ProductDetails() {
             <p className="fs-5 mb-1">
               <strong>Prix :</strong> {product.price} €
             </p>
-            <p className="text-muted">
-              <strong>Quantité disponible :</strong> {product.quantity}
-            </p>
+            
           </div>
 
           <div className="d-grid col-md-4 mx-auto">
