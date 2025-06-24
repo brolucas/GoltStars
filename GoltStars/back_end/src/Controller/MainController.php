@@ -17,8 +17,8 @@ final class MainController extends AbstractController
         ]);
     }
 
-    #[Route('/api/joueur', methods: ['GET', 'HEAD'])]
-    public function getAll(int $id): Response
+    #[Route('/api/categories', methods: ['GET', 'HEAD'])]
+    public function getAll(): Response
     {
         // ... return a JSON response with the post
         return $this->json("blabla");
