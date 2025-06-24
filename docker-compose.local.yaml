@@ -34,7 +34,7 @@ services:
     container_name: react_goltstars_local
     volumes:
       - ./GoltStars/front_end:/app/GoltStars/front_end/
-      - react_node_modules:/app/GoltStars/front_end/GoltStars_front_app/node_modules
+      - react_node_modules:/app/GoltStars/front_end/node_modules
     ports:
       - "3000:3000"
     networks:
@@ -46,7 +46,7 @@ services:
       dockerfile: docker/Dockerfiles/Symfony/Dockerfile_Symfony
     container_name: symfony_goltstars_local
     volumes:
-      - ./GoltStars/back_end:/var/www/html/GoltStars/back_end
+      - ./GoltStars/back_end:/var/www/html/GoltStars/back_end/
     expose:
       - "9000"
     networks:
@@ -57,8 +57,8 @@ services:
       dockerfile: docker/Dockerfiles/Nginx/Dockerfile_Nginx
     container_name: nginx_goltstars_local
     volumes:
-      - ./GoltStars/back_end:/var/www/html/GoltStars/back_end
-      #- react_node_modules:/app/GoltStars/front_end/GoltStars_front_app/node_modules
+      - ./GoltStars/back_end/:/var/www/html/GoltStars/back_end/
+      #- react_node_modules:/app/GoltStars/front_end/GoltStars/node_modules
     ports:
       - "80:80"
       - "443:443"
