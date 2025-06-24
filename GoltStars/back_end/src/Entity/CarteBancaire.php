@@ -4,7 +4,9 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Client;
+use ApiPlatform\Core\Annotation\ApiResource;
 
+#[ApiResource]
 #[ORM\Entity]
 class CarteBancaire
 {
@@ -16,7 +18,7 @@ class CarteBancaire
     #[ORM\Column(type: 'string', length: 20)]
     private string $numeroCarte;
 
-    #[ORM\Column(type: 'string', length: 7)] 
+    #[ORM\Column(type: 'string', length: 7)]
     private string $dateExpiration;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -110,4 +112,4 @@ class CarteBancaire
         $this->client = $client;
         return $this;
     }
-} 
+}

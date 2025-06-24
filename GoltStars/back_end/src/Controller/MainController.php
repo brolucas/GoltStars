@@ -34,7 +34,7 @@ final class MainController extends AbstractController
         return new Response('Categorie : '.$categorie->getNom(), 200, []);
     }
     #[Route('/api/categories', methods: ['GET', 'HEAD'])]
-    public function getAllCategorie(EntityManagerInterface $entityManager): Response
+    public function getAllCategorie(EntityManagerInterface $entityManager): JsonResponse
     {
         $categorie = $entityManager->getRepository(Categorie::class)->findAll();
         if(!$categorie) {
@@ -42,8 +42,8 @@ final class MainController extends AbstractController
                 'No categories found  '
             );
         }
-        //dd($categorie);
-        return $categorie;
-        //return new JsonResponse($categorie, 200, []);
+        dd($categorie);
+        //return $categorie;
+        //return new JsonResponse($categorie);
     }
 }
