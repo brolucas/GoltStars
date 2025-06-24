@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Categorie;
 use Doctrine\ORM\EntityManagerInterface;
+use PhpParser\Node\Expr\Array_;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,12 +42,8 @@ final class MainController extends AbstractController
                 'No categories found  '
             );
         }
-        $resp = new JsonResponse();
         //dd($categorie);
-        //return new Response('Categories : '.$categorie, 200, []);
-        if (is_array($categorie)) {
-            ->setResponse(new JsonResponse($categorie);
-        }
+        return $categorie;
         //return new JsonResponse($categorie, 200, []);
     }
 }
