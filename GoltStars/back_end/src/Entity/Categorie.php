@@ -7,8 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
-#[ORM\Id]
-#[ORM\GeneratedValue]
 #[ORM\Column(type: 'integer')]
 class Categorie
 {
