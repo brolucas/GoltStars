@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Categorie;
+use App\Entity\Produit;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpParser\Node\Expr\Array_;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -42,8 +43,41 @@ final class MainController extends AbstractController
                 'No categories found  '
             );
         }
-        dd($categorie);
+        $arr = array();
+        foreach ($categorie as $c) {
+           $Nom= $c->getNom();
+           $id = $c->getId();
+           $arr[$id] = $Nom;
+        }
+        //dd($categorie);
         //return $categorie;
-        //return new JsonResponse($categorie);
+        return new JsonResponse($arr);
+    }
+
+    #[Route('/api/products', methods: ['GET', 'HEAD'])]
+    public function getAllProduct(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $produit = $entityManager->getRepository(Produit::class)->findAll();
+        if(!$produit) {
+            throw $this->createNotFoundException(
+                'No categories found  '
+            );
+        }
+        $arr = array();
+        foreach ($produit as $p) {
+            $Nom= $p->getNom();
+            $id = $p->getId();
+            $prix = $p->getPrix();
+            $url = $p->getUrl();
+            $arr2=array();
+            $arr2["Id"] = $id;
+            $arr2["Nom"] = $Nom;
+            $arr2["Prix"] = $prix;
+            $arr2["Url"] = $url;
+            $arr[] = $arr2;
+        }
+        //dd($categorie);
+        //return $categorie;
+        return new JsonResponse($arr);
     }
 }

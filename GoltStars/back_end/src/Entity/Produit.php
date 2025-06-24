@@ -73,6 +73,10 @@ class Produit
     {
         return $this->categories;
     }
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
 
     public function addCategorie(Categorie $categorie): self
     {
