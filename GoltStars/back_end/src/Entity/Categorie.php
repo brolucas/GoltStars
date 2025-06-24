@@ -21,8 +21,9 @@ class Categorie
     #[ORM\ManyToMany(targetEntity: Produit::class, mappedBy: 'categories')]
     private Collection $produits;
 
-    public function __construct()
+    public function __construct(string $nom)
     {
+        $this->nom = $nom;
         $this->produits = new ArrayCollection();
     }
 
