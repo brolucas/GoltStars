@@ -76,8 +76,6 @@ final class MainController extends AbstractController
             $arr2["Url"] = $url;
             $arr[] = $arr2;
         }
-        //dd($categorie);
-        //return $categorie;
         return new JsonResponse($arr);
     }
 }
