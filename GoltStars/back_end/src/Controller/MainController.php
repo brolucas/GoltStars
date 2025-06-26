@@ -186,7 +186,7 @@ final class MainController extends AbstractController
     /**
      * @OA\Get(
      *     path="/api/product/{id}",
-     *     summary="Récupérer un produit par son id",
+     *     summary="Récupérer un produit par son id avec ses catégories",
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *     @OA\Response(response=200, description="Produit trouvé"),
      *     @OA\Response(response=404, description="Produit non trouvé")
@@ -199,11 +199,19 @@ final class MainController extends AbstractController
         if (!$produit) {
             return new JsonResponse(['error' => 'Produit non trouvé'], 404);
         }
+        $categories = [];
+        foreach ($produit->getCategories() as $cat) {
+            $categories[] = [
+                'id' => $cat->getId(),
+                'nom' => $cat->getNom()
+            ];
+        }
         return new JsonResponse([
             'id' => $produit->getId(),
             'nom' => $produit->getNom(),
             'prix' => $produit->getPrix(),
-            'url' => $produit->getUrl()
+            'url' => $produit->getUrl(),
+            'categories' => $categories
         ]);
     }
 
