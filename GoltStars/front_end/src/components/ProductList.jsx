@@ -1,23 +1,37 @@
-import { useState } from "react";
-import { products } from "../data/products";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function ProductList() {
   const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [categorySearch, setCategorySearch] = useState("");
 
-  // Toutes les catégories (dédiquées à la recherche + affichage boutons)
+  useEffect(() => {
+    axios.get("https://localhost/api/products")
+      .then((res) => {
+        console.error(res.data);
+        setProducts(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Erreur de chargement");
+        setLoading(false);
+      });
+  }, []);
+
   const allCategories = Array.from(
-    new Set(products.flatMap((p) => p.categories))
+    new Set(products.flatMap((p) => p.categories || []))
   );
 
-  // Liste filtrée selon la recherche
   const filteredCategories = allCategories.filter((cat) =>
     cat.toLowerCase().includes(categorySearch.toLowerCase())
   );
 
-  // Toggle (ajouter/enlever) une catégorie
   const toggleCategory = (cat) => {
     setSelectedCategories((prev) =>
       prev.includes(cat)
@@ -26,7 +40,6 @@ export default function ProductList() {
     );
   };
 
-  // Filtrage des produits selon sélection
   const filteredProducts =
     selectedCategories.length === 0
       ? products
@@ -36,15 +49,14 @@ export default function ProductList() {
 
   return (
     <div className="container py-5">
-      {/* Intro */}
-       <button
-                    className="btn btn-outline-primary"
-                    onClick={() => navigate(`/admin/create`)}
-                    style={{ position: "absolute", top: "20px", right: "20px" }}
-                  >
-                   Administrateur
-                  </button>
-      {/* SECTION HERO / INTRO */}
+      <button
+        className="btn btn-outline-primary"
+        onClick={() => navigate(`/admin/create`)}
+        style={{ position: "absolute", top: "20px", right: "20px" }}
+      >
+        Administrateur
+      </button>
+
       <section className="text-center mb-5">
         <h1 className="display-4 fw-bold">✨ GoltStars – Le prestige sportif</h1>
         <p className="lead text-muted mx-auto" style={{ maxWidth: "700px" }}>
@@ -57,7 +69,6 @@ export default function ProductList() {
         </p>
       </section>
 
-      {/* --- BARRE DE RECHERCHE + FILTRES --- */}
       <div className="mb-4">
         <div className="mb-2 d-flex flex-column flex-md-row gap-2 align-items-start align-items-md-center">
           <h6 className="mb-0 text-muted">Filtrer par catégorie :</h6>
@@ -91,15 +102,17 @@ export default function ProductList() {
         </div>
       </div>
 
-      {/* LISTE DES PRODUITS */}
+      {loading && <p className="text-center">Chargement des produits...</p>}
+      {error && <p className="text-center text-danger">{error}</p>}
+
       <div className="row">
         {filteredProducts.map((product) => (
-          <div className="col-md-6 col-lg-4 mb-4" key={product.id}>
+          <div className="col-md-6 col-lg-4 mb-4" key={product.Id}>
             <div className="card shadow-sm h-100 border-0">
               <div
                 className="position-relative"
                 style={{
-                  height: "500PX",
+                  height: "500px",
                   width: "100%",
                   overflow: "hidden",
                   borderTopLeftRadius: "0.5rem",
@@ -107,33 +120,34 @@ export default function ProductList() {
                 }}
               >
                 <img
-                  src={product.image}
+                  src={product.Url
+                  ? product.Url
+                  : "https://via.placeholder.com/300x400?text=Image+non+disponible"}
                   alt={product.name}
                   className="w-100 h-100"
                   style={{ objectFit: "cover" }}
                 />
               </div>
               <div className="card-body d-flex flex-column justify-content-between">
-                <h5 className="card-title text-primary text-center">{product.name}</h5>
+                <h5 className="card-title text-primary text-center">{product.Nom}</h5>
                 <p className="text-secondary text-center" style={{ fontSize: "0.9rem" }}>
                   {product.description}
                 </p>
                 <p className="text-center text-muted mb-2">
-                  <strong>Prix :</strong> {product.price} €<br />
-                  
+                  <strong>Prix :</strong> {product.Prix} €
                 </p>
                 <div className="d-grid mt-auto">
                   <button
                     className="btn btn-outline-primary"
-                    onClick={() => navigate(`/produit/${product.id}`)}
+                    onClick={() => navigate(`/produit/${product.Id}`)}
                   >
                     Voir le produit
                   </button>
-                  <button 
+                  <button
                     className="btn btn-outline-secondary mt-2"
-                    onClick={() => navigate(`/admin/edit/${product.id}`)}
-                    >
-                     ✏️ Modifier
+                    onClick={() => navigate(`/admin/edit/${product.Id}`)}
+                  >
+                    ✏️ Modifier
                   </button>
                 </div>
               </div>
@@ -142,7 +156,7 @@ export default function ProductList() {
         ))}
       </div>
 
-      {filteredProducts.length === 0 && (
+      {filteredProducts.length === 0 && !loading && !error && (
         <p className="text-muted text-center mt-4">
           Aucun produit ne correspond aux filtres sélectionnés.
         </p>

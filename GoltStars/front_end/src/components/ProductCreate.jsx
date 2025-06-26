@@ -4,12 +4,9 @@ import { useNavigate } from "react-router-dom";
 
 export default function ProductCreate() {
   const [form, setForm] = useState({
-    name: "",
-    price: "",
-    quantity: "",
-    description: "",
-    categories: "",
-    image: ""
+    nom: "",           // 🔄 "name" → "nom"
+    prix: "",          // 🔄 "price" → "prix"
+    url: "",           // 🔄 "image" → "url"
   });
 
   const [message, setMessage] = useState("");
@@ -24,25 +21,24 @@ export default function ProductCreate() {
     e.preventDefault();
 
     const payload = {
-      ...form,
-      price: parseFloat(form.price),
-      quantity: parseInt(form.quantity),
-      categories: form.categories.split(",").map((cat) => cat.trim()),
+      nom: form.nom,
+      prix: parseFloat(form.prix),
+      url: form.url
     };
 
     try {
-      await axios.post("http://localhost:8000/api/products", payload);
+      await axios.post("https://localhost/api/product", payload);
       setMessage("Produit créé avec succès !");
       setTimeout(() => navigate("/"), 1500);
     } catch (err) {
       console.error(err);
-      setMessage("Erreur lors de la création.");
+      setMessage("Erreur lors de la création du produit.");
     }
   };
 
   return (
     <div className="container py-4">
-        <button className="btn btn-secondary mb-4" onClick={() => navigate('/')}>
+      <button className="btn btn-secondary mb-4" onClick={() => navigate('/')}>
         ← Retour
       </button>
       <h2 className="mb-4">Créer un nouveau produit</h2>
@@ -50,35 +46,40 @@ export default function ProductCreate() {
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label>Nom</label>
-          <input type="text" name="name" className="form-control" required onChange={handleChange} />
+          <input
+            type="text"
+            name="nom"
+            className="form-control"
+            required
+            onChange={handleChange}
+          />
         </div>
 
         <div className="mb-3">
           <label>Prix (€)</label>
-          <input type="number" name="price" className="form-control" required onChange={handleChange} />
+          <input
+            type="number"
+            name="prix"
+            className="form-control"
+            required
+            onChange={handleChange}
+          />
         </div>
 
         <div className="mb-3">
-          <label>Quantité</label>
-          <input type="number" name="quantity" className="form-control" required onChange={handleChange} />
+          <label>Image (URL)</label>
+          <input
+            type="text"
+            name="url"
+            className="form-control"
+            required
+            onChange={handleChange}
+          />
         </div>
 
-        <div className="mb-3">
-          <label>Description</label>
-          <textarea name="description" className="form-control" required onChange={handleChange} />
-        </div>
-
-        <div className="mb-3">
-          <label>Catégories (séparées par des virgules)</label>
-          <input type="text" name="categories" className="form-control" onChange={handleChange} />
-        </div>
-
-        <div className="mb-3">
-          <label>Image (URL pour l’instant)</label>
-          <input type="text" name="image" className="form-control" onChange={handleChange} />
-        </div>
-
-        <button className="btn btn-primary" type="submit">Créer</button>
+        <button className="btn btn-primary" type="submit">
+          Créer
+        </button>
       </form>
 
       {message && <p className="mt-3">{message}</p>}
