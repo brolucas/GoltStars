@@ -188,4 +188,39 @@ final class MainController extends AbstractController
             'url' => $produit->getUrl()
         ]);
     }
+
+    /**
+     * @OA\Post(
+     *     path="/api/categorie",
+     *     summary="Ajouter une catégorie",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="nom", type="string")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Catégorie ajoutée"),
+     *     @OA\Response(response=400, description="Erreur de validation")
+     * )
+     */
+    #[Route('/api/categorie', name: 'add_categorie', methods: ['POST'])]
+    public function addCategorie(EntityManagerInterface $entityManager, \Symfony\Component\HttpFoundation\Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!$data || empty($data['nom'])) {
+            return new JsonResponse(['error' => 'Champ nom manquant'], 400);
+        }
+        $categorie = new \App\Entity\Categorie();
+        $categorie->setNom($data['nom']);
+        $entityManager->persist($categorie);
+        $entityManager->flush();
+        return new JsonResponse([
+            'message' => 'Catégorie ajoutée',
+            'id' => $categorie->getId()
+        ], 201);
+    }
 }
