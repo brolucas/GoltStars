@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use function MongoDB\BSON\toJSON;
+use OpenApi\Annotations as OA;
 
 
 final class MainController extends AbstractController
@@ -54,6 +55,13 @@ final class MainController extends AbstractController
         return new JsonResponse($arr);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/products",
+     *     summary="Lister tous les produits",
+     *     @OA\Response(response=200, description="Liste des produits")
+     * )
+     */
     #[Route('/api/products', methods: ['GET', 'HEAD'])]
     public function getAllProduct(EntityManagerInterface $entityManager): JsonResponse
     {
@@ -77,5 +85,83 @@ final class MainController extends AbstractController
             $arr[] = $arr2;
         }
         return new JsonResponse($arr);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/product",
+     *     summary="Ajouter un produit",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="nom", type="string"),
+     *                 @OA\Property(property="prix", type="number"),
+     *                 @OA\Property(property="url", type="string")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Produit ajouté"),
+     *     @OA\Response(response=400, description="Erreur de validation")
+     * )
+     */
+    #[Route('/api/product', name: 'add_product', methods: ['POST'])]
+    public function addProduct(EntityManagerInterface $entityManager, \Symfony\Component\HttpFoundation\Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!$data || empty($data['nom']) || !isset($data['prix']) || empty($data['url'])) {
+            return new JsonResponse(['error' => 'Champs nom, prix ou url manquants'], 400);
+        }
+        $produit = new Produit();
+        $produit->setNom($data['nom']);
+        $produit->setPrix((float)$data['prix']);
+        $produit->setUrl($data['url']);
+        $entityManager->persist($produit);
+        $entityManager->flush();
+        return new JsonResponse([
+            'message' => 'Produit ajouté',
+            'id' => $produit->getId()
+        ], 201);
+    }
+
+    /**
+     * @OA\Patch(
+     *     path="/api/product/{id}",
+     *     summary="Modifier un produit",
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="nom", type="string"),
+     *                 @OA\Property(property="prix", type="number"),
+     *                 @OA\Property(property="url", type="string")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Produit modifié"),
+     *     @OA\Response(response=404, description="Produit non trouvé")
+     * )
+     */
+    #[Route('/api/product/{id}', name: 'update_product', methods: ['PATCH'])]
+    public function updateProduct(int $id, EntityManagerInterface $entityManager, \Symfony\Component\HttpFoundation\Request $request): JsonResponse
+    {
+        $produit = $entityManager->getRepository(Produit::class)->find($id);
+        if (!$produit) {
+            return new JsonResponse(['error' => 'Produit non trouvé'], 404);
+        }
+        $data = json_decode($request->getContent(), true);
+        if (!$data) {
+            return new JsonResponse(['error' => 'Données JSON invalides'], 400);
+        }
+        if (!empty($data['nom'])) $produit->setNom($data['nom']);
+        if (isset($data['prix'])) $produit->setPrix((float)$data['prix']);
+        if (!empty($data['url'])) $produit->setUrl($data['url']);
+        $entityManager->flush();
+        return new JsonResponse(['message' => 'Produit modifié']);
     }
 }
