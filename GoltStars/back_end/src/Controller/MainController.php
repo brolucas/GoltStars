@@ -58,14 +58,14 @@ final class MainController extends AbstractController
     /**
      * @OA\Get(
      *     path="/api/products",
-     *     summary="Lister tous les produits",
+     *     summary="Lister tous les produits avec leurs catégories",
      *     @OA\Response(response=200, description="Liste des produits")
      * )
      */
     #[Route('/api/products', methods: ['GET', 'HEAD'])]
     public function getAllProduct(EntityManagerInterface $entityManager): JsonResponse
     {
-        $produit = $entityManager->getRepository(Produit::class)->findAll();
+        $produit = $entityManager->getRepository(\App\Entity\Produit::class)->findAll();
         if(!$produit) {
             throw $this->createNotFoundException(
                 'No categories found  '
@@ -77,11 +77,19 @@ final class MainController extends AbstractController
             $id = $p->getId();
             $prix = $p->getPrix();
             $url = $p->getUrl();
+            $categories = [];
+            foreach ($p->getCategories() as $cat) {
+                $categories[] = [
+                    'id' => $cat->getId(),
+                    'nom' => $cat->getNom()
+                ];
+            }
             $arr2=array();
             $arr2["Id"] = $id;
             $arr2["Nom"] = $Nom;
             $arr2["Prix"] = $prix;
             $arr2["Url"] = $url;
+            $arr2["Categories"] = $categories;
             $arr[] = $arr2;
         }
         return new JsonResponse($arr);
@@ -90,7 +98,7 @@ final class MainController extends AbstractController
     /**
      * @OA\Post(
      *     path="/api/product",
-     *     summary="Ajouter un produit",
+     *     summary="Ajouter un produit avec catégories",
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\MediaType(
@@ -99,7 +107,8 @@ final class MainController extends AbstractController
      *                 type="object",
      *                 @OA\Property(property="nom", type="string"),
      *                 @OA\Property(property="prix", type="number"),
-     *                 @OA\Property(property="url", type="string")
+     *                 @OA\Property(property="url", type="string"),
+     *                 @OA\Property(property="categories", type="array", @OA\Items(type="integer"))
      *             )
      *         )
      *     ),
@@ -114,10 +123,19 @@ final class MainController extends AbstractController
         if (!$data || empty($data['nom']) || !isset($data['prix']) || empty($data['url'])) {
             return new JsonResponse(['error' => 'Champs nom, prix ou url manquants'], 400);
         }
-        $produit = new Produit();
+        $produit = new \App\Entity\Produit();
         $produit->setNom($data['nom']);
         $produit->setPrix((float)$data['prix']);
         $produit->setUrl($data['url']);
+        // Ajout des catégories si présentes
+        if (!empty($data['categories']) && is_array($data['categories'])) {
+            foreach ($data['categories'] as $catId) {
+                $categorie = $entityManager->getRepository(\App\Entity\Categorie::class)->find($catId);
+                if ($categorie) {
+                    $produit->addCategorie($categorie);
+                }
+            }
+        }
         $entityManager->persist($produit);
         $entityManager->flush();
         return new JsonResponse([
