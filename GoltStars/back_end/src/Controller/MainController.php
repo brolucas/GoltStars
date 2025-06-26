@@ -164,4 +164,28 @@ final class MainController extends AbstractController
         $entityManager->flush();
         return new JsonResponse(['message' => 'Produit modifié']);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/product/{id}",
+     *     summary="Récupérer un produit par son id",
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Produit trouvé"),
+     *     @OA\Response(response=404, description="Produit non trouvé")
+     * )
+     */
+    #[Route('/api/product/{id}', name: 'get_product', methods: ['GET'])]
+    public function getProductById(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $produit = $entityManager->getRepository(Produit::class)->find($id);
+        if (!$produit) {
+            return new JsonResponse(['error' => 'Produit non trouvé'], 404);
+        }
+        return new JsonResponse([
+            'id' => $produit->getId(),
+            'nom' => $produit->getNom(),
+            'prix' => $produit->getPrix(),
+            'url' => $produit->getUrl()
+        ]);
+    }
 }
