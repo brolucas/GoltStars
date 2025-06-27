@@ -14,7 +14,7 @@ use function MongoDB\BSON\toJSON;
 use OpenApi\Annotations as OA;
 
 
-final class MainController extends AbstractController
+final class ProduitController extends AbstractController
 {
     #[Route('/main', name: 'app_main')]
     public function index(): Response
@@ -248,5 +248,19 @@ final class MainController extends AbstractController
             'message' => 'Catégorie ajoutée',
             'id' => $categorie->getId()
         ], 201);
+    }
+    #[Route('/api/product/{id}', name: 'delete_product', methods: ['DELETE'])]
+    public function deleteProduct(int $id, EntityManagerInterface $em): JsonResponse
+    {
+        $produit = $em->getRepository(Produit::class)->find($id);
+
+        if (!$produit) {
+            return new JsonResponse(['error' => 'Produit non trouvé'], 404);
+        }
+
+        $em->remove($produit);
+        $em->flush();
+
+        return new JsonResponse(['message' => 'Produit supprimé avec succès'], 204);
     }
 }

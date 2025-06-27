@@ -28,6 +28,10 @@ COPY ./GoltStars/back_end/composer.json .
 
 RUN composer install
 
+
+
+
+
 ## Copie du projet symfony dans '/var/www/html/GoltStars/back_end'
 COPY ./GoltStars/back_end .
 
