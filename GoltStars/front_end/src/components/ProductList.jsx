@@ -160,12 +160,6 @@ export default function ProductList() {
                   >
                     Voir le produit
                   </button>
-                  <button
-                    className="btn btn-outline-secondary mt-2"
-                    onClick={() => navigate(`/admin/edit/${product.Id}`)}
-                  >
-                    ✏️ Modifier
-                  </button>
                 </div>
               </div>
             </div>

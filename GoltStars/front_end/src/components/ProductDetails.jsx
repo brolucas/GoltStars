@@ -14,6 +14,7 @@ export default function ProductDetails() {
     axios
       .get(`https://localhost/api/product/${id}`)
       .then((res) => {
+        console.log("Produit récupéré :", res.data);
         setProduct(res.data);
         setLoading(false);
       })
@@ -65,9 +66,13 @@ export default function ProductDetails() {
           }}
         >
           <img
-            src={product.url || "https://via.placeholder.com/300x400?text=Image"}
+            src={
+              product.url && product.url.startsWith("http")
+                ? product.url
+                : `https://localhost${product.url}`
+            }
             className="w-100 h-100"
-            alt={product.Nom}
+            alt={product.nom}
             style={{ objectFit: "cover" }}
           />
         </div>
@@ -77,11 +82,12 @@ export default function ProductDetails() {
             {product.nom}
           </h2>
 
+          {/* ✅ Corrigé : Affichage des catégories selon format [{ id, nom }] */}
           {product.categories && Array.isArray(product.categories) && (
             <div className="text-center mb-3">
               {product.categories.map((cat) => (
-                <span key={cat} className="badge bg-light text-dark me-2 mb-2 border">
-                  {cat}
+                <span key={cat.id} className="badge bg-light text-dark me-2 mb-2 border">
+                  {cat.nom}
                 </span>
               ))}
             </div>
