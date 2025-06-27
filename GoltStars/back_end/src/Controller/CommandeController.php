@@ -10,31 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use OpenApi\Annotations as OA;
 
 class CommandeController extends AbstractController
 {
-    /**
-     * @OA\Post(
-     *     path="/api/commande",
-     *     summary="Créer une commande",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="application/json",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 @OA\Property(property="id", type="string"),
-     *                 @OA\Property(property="dateLivraison", type="string"),
-     *                 @OA\Property(property="clientId", type="integer"),
-     *                 @OA\Property(property="produits", type="array", @OA\Items(type="integer"))
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=201, description="Commande créée avec succès"),
-     *     @OA\Response(response=400, description="Erreur de validation")
-     * )
-     */
     #[Route('/api/commande', name: 'create_commande', methods: ['POST'])]
     public function createCommande(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -83,15 +61,6 @@ class CommandeController extends AbstractController
         ], 201);
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/commande/{id}",
-     *     summary="Récupérer une commande par son id",
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string")),
-     *     @OA\Response(response=200, description="Commande trouvée"),
-     *     @OA\Response(response=404, description="Commande non trouvée")
-     * )
-     */
     #[Route('/api/commande/{id}', name: 'get_commande', methods: ['GET'])]
     public function getCommande(string $id, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -116,13 +85,6 @@ class CommandeController extends AbstractController
         ]);
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/commandes",
-     *     summary="Lister toutes les commandes",
-     *     @OA\Response(response=200, description="Liste des commandes")
-     * )
-     */
     #[Route('/api/commandes', name: 'get_all_commandes', methods: ['GET'])]
     public function getAllCommandes(EntityManagerInterface $entityManager): JsonResponse
     {
@@ -139,15 +101,6 @@ class CommandeController extends AbstractController
         return new JsonResponse($result);
     }
 
-    /**
-     * @OA\Delete(
-     *     path="/api/commande/{id}",
-     *     summary="Supprimer une commande",
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string")),
-     *     @OA\Response(response=200, description="Commande supprimée"),
-     *     @OA\Response(response=404, description="Commande non trouvée")
-     * )
-     */
     #[Route('/api/commande/{id}', name: 'delete_commande', methods: ['DELETE'])]
     public function deleteCommande(string $id, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -160,25 +113,6 @@ class CommandeController extends AbstractController
         return new JsonResponse(['message' => 'Commande supprimée avec succès']);
     }
 
-    /**
-     * @OA\Patch(
-     *     path="/api/commande/{id}/date",
-     *     summary="Mettre à jour la date de livraison d'une commande",
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string")),
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="application/json",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 @OA\Property(property="dateLivraison", type="string")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=200, description="Date de livraison mise à jour"),
-     *     @OA\Response(response=404, description="Commande non trouvée")
-     * )
-     */
     #[Route('/api/commande/{id}/date', name: 'update_date_livraison', methods: ['PATCH'])]
     public function updateDateLivraison(string $id, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {

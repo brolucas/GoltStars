@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use function MongoDB\BSON\toJSON;
-use OpenApi\Annotations as OA;
 
 
 final class MainController extends AbstractController
@@ -55,13 +54,6 @@ final class MainController extends AbstractController
         return new JsonResponse($arr);
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/products",
-     *     summary="Lister tous les produits avec leurs catégories",
-     *     @OA\Response(response=200, description="Liste des produits")
-     * )
-     */
     #[Route('/api/products', methods: ['GET', 'HEAD'])]
     public function getAllProduct(EntityManagerInterface $entityManager): JsonResponse
     {
@@ -95,27 +87,6 @@ final class MainController extends AbstractController
         return new JsonResponse($arr);
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/product",
-     *     summary="Ajouter un produit avec catégories",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="application/json",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 @OA\Property(property="nom", type="string"),
-     *                 @OA\Property(property="prix", type="number"),
-     *                 @OA\Property(property="url", type="string"),
-     *                 @OA\Property(property="categories", type="array", @OA\Items(type="integer"))
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=201, description="Produit ajouté"),
-     *     @OA\Response(response=400, description="Erreur de validation")
-     * )
-     */
     #[Route('/api/product', name: 'add_product', methods: ['POST'])]
     public function addProduct(EntityManagerInterface $entityManager, \Symfony\Component\HttpFoundation\Request $request): JsonResponse
     {
@@ -144,27 +115,6 @@ final class MainController extends AbstractController
         ], 201);
     }
 
-    /**
-     * @OA\Patch(
-     *     path="/api/product/{id}",
-     *     summary="Modifier un produit",
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="application/json",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 @OA\Property(property="nom", type="string"),
-     *                 @OA\Property(property="prix", type="number"),
-     *                 @OA\Property(property="url", type="string")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=200, description="Produit modifié"),
-     *     @OA\Response(response=404, description="Produit non trouvé")
-     * )
-     */
     #[Route('/api/product/{id}', name: 'update_product', methods: ['PATCH'])]
     public function updateProduct(int $id, EntityManagerInterface $entityManager, \Symfony\Component\HttpFoundation\Request $request): JsonResponse
     {
@@ -183,15 +133,6 @@ final class MainController extends AbstractController
         return new JsonResponse(['message' => 'Produit modifié']);
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/product/{id}",
-     *     summary="Récupérer un produit par son id avec ses catégories",
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="Produit trouvé"),
-     *     @OA\Response(response=404, description="Produit non trouvé")
-     * )
-     */
     #[Route('/api/product/{id}', name: 'get_product', methods: ['GET'])]
     public function getProductById(int $id, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -215,24 +156,6 @@ final class MainController extends AbstractController
         ]);
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/categorie",
-     *     summary="Ajouter une catégorie",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="application/json",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 @OA\Property(property="nom", type="string")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=201, description="Catégorie ajoutée"),
-     *     @OA\Response(response=400, description="Erreur de validation")
-     * )
-     */
     #[Route('/api/categorie', name: 'add_categorie', methods: ['POST'])]
     public function addCategorie(EntityManagerInterface $entityManager, \Symfony\Component\HttpFoundation\Request $request): JsonResponse
     {
