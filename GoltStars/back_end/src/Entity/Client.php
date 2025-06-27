@@ -34,12 +34,12 @@ class Client
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: CarteBancaire::class)]
     private Collection $cartesBancaires;
 
-    public function __construct(string $nom, string $prenom, string $adresseLivraison, string $numeroTelephone)
+    public function __construct(string $nom, string $prenom, string $adresseLivraison, ?string $numeroTelephone)
     {
         $this->nom = $nom;
         $this->prenom = $prenom;
         $this->adresseLivraison = $adresseLivraison;
-        $this->numeroTelephone = $numeroTelephone;
+        $this->numeroTelephone = $numeroTelephone ?? '';
         $this->cartesBancaires = new ArrayCollection();
     }
 

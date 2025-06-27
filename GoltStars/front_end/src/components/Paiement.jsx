@@ -14,6 +14,26 @@ export default function Paiement() {
 
   if (!product) return <p>Erreur : aucun produit sélectionné.</p>;
 
+  // Nouvelle fonction pour gérer le résultat du paiement et passer toutes les infos à la confirmation
+  const handleResult = (success, msg, extra = {}) => {
+    setMessage(msg);
+    if (success) {
+      navigate("/confirmation", {
+        state: {
+          message: msg,
+          commande: {
+            produit: product,
+            client: clientInfo,
+            dateLivraison: extra.dateLivraison,
+            numeroCommande: extra.numeroCommande,
+          },
+        },
+      });
+    } else {
+      navigate("/confirmation", { state: { message: msg } });
+    }
+  };
+
   return (
     <div className="container py-4">
       {step === 1 && (
@@ -28,10 +48,7 @@ export default function Paiement() {
         <Step2Form
           clientData={clientInfo}
           product={product}
-          onResult={(success, msg) => {
-            setMessage(msg);
-            navigate("/confirmation", { state: { message: msg } });
-          }}
+          onResult={handleResult}
         />
       )}
     </div>

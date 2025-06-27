@@ -43,43 +43,90 @@ class CommandeController extends AbstractController
             return new JsonResponse(['error' => 'Données JSON invalides'], 400);
         }
 
-        // Vérification des champs requis
-        foreach (["id", "dateLivraison", "clientId", "produits"] as $field) {
+        // Vérification des champs requis (on retire dateLivraison du check obligatoire)
+        foreach (["id", "produits"] as $field) {
             if (empty($data[$field])) {
                 return new JsonResponse(['error' => "Champ manquant : $field"], 400);
             }
         }
 
-        // Récupération du client
-        $client = $entityManager->getRepository(Client::class)->find($data['clientId']);
-        if (!$client) {
-            return new JsonResponse(['error' => 'Client non trouvé'], 404);
+        // Gestion du client
+        $client = null;
+        if (!empty($data['client']['nom'])) {
+            $c = $data['client'];
+            foreach (["nom", "prenom", "adresseLivraison"] as $field) {
+                if (empty($c[$field])) {
+                    return new JsonResponse(['error' => "Champ client manquant : $field"], 400);
+                }
+            }
+            $numeroTelephone = $c['numeroTelephone'] ?? null;
+            $client = new \App\Entity\Client(
+                $c['nom'],
+                $c['prenom'],
+                $c['adresseLivraison'],
+                $numeroTelephone
+            );
+            // Création de la carte bancaire si présente
+            if (!empty($c['carteBancaire'])) {
+                $cb = $c['carteBancaire'];
+                foreach (["numeroCarte", "dateExpiration", "nomTitulaire", "adresseFacturation", "cryptogramme"] as $field) {
+                    if (empty($cb[$field])) {
+                        return new JsonResponse(['error' => "Champ carte bancaire manquant : $field"], 400);
+                    }
+                }
+                $carte = new \App\Entity\CarteBancaire(
+                    $cb['numeroCarte'],
+                    $cb['dateExpiration'],
+                    $cb['adresseFacturation'],
+                    $cb['cryptogramme'],
+                    $client
+                );
+                $carte->setNomTitulaire($cb['nomTitulaire']);
+                $client->getCartesBancaires()->add($carte);
+                $entityManager->persist($carte);
+            }
+            $entityManager->persist($client);
+        } elseif (!empty($data['clientId'])) {
+            $client = $entityManager->getRepository(\App\Entity\Client::class)->find($data['clientId']);
+            if (!$client) {
+                return new JsonResponse(['error' => 'Client non trouvé'], 404);
+            }
+        } else {
+            return new JsonResponse(['error' => 'Informations client manquantes'], 400);
         }
 
-        // Création de la commande
-        try {
-            $dateLivraison = new \DateTime($data['dateLivraison']);
-        } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Format de date invalide'], 400);
+        // Gestion de la date de livraison
+        if (!empty($data['dateLivraison'])) {
+            try {
+                $dateLivraison = new \DateTime($data['dateLivraison']);
+            } catch (\Exception $e) {
+                return new JsonResponse(['error' => 'Format de date invalide'], 400);
+            }
+        } else {
+            // Date aléatoire entre 7 et 14 jours après aujourd'hui
+            $days = random_int(7, 14);
+            $dateLivraison = (new \DateTime())->modify("+{$days} days");
         }
-        $commande = new Commande($data['id'], $dateLivraison, $client);
+
+        $commande = new \App\Entity\Commande($data['id'], $dateLivraison, $client);
 
         // Ajout des produits
         foreach ($data['produits'] as $produitId) {
-            $produit = $entityManager->getRepository(Produit::class)->find($produitId);
+            $produit = $entityManager->getRepository(\App\Entity\Produit::class)->find($produitId);
             if (!$produit) {
                 return new JsonResponse(['error' => "Produit non trouvé : $produitId"], 404);
             }
             $commande->addProduit($produit);
         }
 
-        // Persistance
         $entityManager->persist($commande);
         $entityManager->flush();
 
         return new JsonResponse([
             'message' => 'Commande créée avec succès',
-            'commande_id' => $commande->getId()
+            'commande_id' => $commande->getId(),
+            'client_id' => $client->getId(),
+            'dateLivraison' => $commande->getDateLivraison()->format('Y-m-d')
         ], 201);
     }
 
