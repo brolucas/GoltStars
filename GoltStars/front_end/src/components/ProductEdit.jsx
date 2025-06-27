@@ -6,21 +6,29 @@ export default function ProductEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState(null);
+  const [form, setForm] = useState({ nom: "", prix: "", url: "" });
+  const [original, setOriginal] = useState({ nom: "", prix: "", url: "" });
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    axios.get(`https://localhost/api/product/${id}`)
-      .then((res) => {
-        const p = res.data;
-        setForm({
-          nom: p.Nom || "",
-          prix: p.Prix || 0,
-          url: p.Url || ""
-        });
-      })
-      .catch(() => setMessage("Erreur lors du chargement du produit."));
-  }, [id]);
+  axios.get(`https://localhost/api/product/${id}`)
+    .then((res) => {
+      const p = res.data;
+      // Accepte les deux formats de clés
+      setForm({
+        nom: p.nom || p.Nom || "",
+        prix: p.prix || p.Prix || "",
+        url: p.url || p.Url || ""
+      });
+      setOriginal({
+        nom: p.nom || p.Nom || "",
+        prix: p.prix || p.Prix || "",
+        url: p.url || p.Url || ""
+      });
+    })
+    .catch(() => setMessage("❌ Erreur lors du chargement du produit."));
+}, [id]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,12 +38,18 @@ export default function ProductEdit() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const updates = {};
+    if (form.nom !== original.nom) updates.nom = form.nom;
+    if (form.prix !== original.prix) updates.prix = parseFloat(form.prix);
+    if (form.url !== original.url) updates.url = form.url;
+
+    if (Object.keys(updates).length === 0) {
+      setMessage("Aucune modification à enregistrer.");
+      return;
+    }
+
     try {
-      await axios.patch(`https://localhost/api/product/${id}`, {
-        nom: form.nom,
-        prix: parseFloat(form.prix),
-        url: form.url
-      });
+      await axios.patch(`https://localhost/api/product/${id}`, updates);
       setMessage("✅ Produit mis à jour !");
       setTimeout(() => navigate(`/produit/${id}`), 1500);
     } catch (err) {
@@ -44,82 +58,46 @@ export default function ProductEdit() {
     }
   };
 
-  if (!form) return <p className="text-center">Chargement...</p>;
-
   return (
-    <div className="container py-5">
-      <button className="btn btn-secondary mb-4" onClick={() => navigate(-1)}>
-        ← Retour
-      </button>
+    <div className="container py-4">
+      <h2 className="mb-4">Modifier le produit</h2>
 
-      <h2 className="mb-4 text-primary">Modifier le produit</h2>
-
-      {/* Aperçu du produit actuel */}
-      <div className="card mb-5 shadow-sm">
-        <div className="row g-0">
-          <div className="col-md-4">
-            <img
-              src={form.url || "https://via.placeholder.com/400x300?text=Image"}
-              alt={form.nom}
-              className="img-fluid rounded-start"
-              style={{ objectFit: "cover", height: "100%" }}
-            />
-          </div>
-          <div className="col-md-8">
-            <div className="card-body">
-              <h5 className="card-title">{form.nom}</h5>
-              <p className="card-text">
-                <strong>Prix :</strong> {form.prix} €
-              </p>
-              <p className="card-text text-muted">
-                <small>Prévisualisation actuelle</small>
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* Affichage des infos actuelles */}
+      <div className="bg-light border rounded p-3 mb-4">
+        <p><strong>Nom actuel :</strong> {original.nom}</p>
+        <p><strong>Prix actuel :</strong> {original.prix} €</p>
+        <p><strong>Image actuelle :</strong> {original.url}</p>
       </div>
 
-      {/* Formulaire de modification */}
       <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Nom du produit</label>
-          <input
-            type="text"
-            name="nom"
-            value={form.nom}
-            onChange={handleChange}
-            className="form-control"
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Prix (€)</label>
-          <input
-            type="number"
-            name="prix"
-            value={form.prix}
-            onChange={handleChange}
-            className="form-control"
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">URL de l'image</label>
-          <input
-            type="text"
-            name="url"
-            value={form.url}
-            onChange={handleChange}
-            className="form-control"
-          />
-        </div>
-
-        <button type="submit" className="btn btn-warning">✅ Enregistrer les modifications</button>
+        <input
+          type="text"
+          name="nom"
+          value={form.nom}
+          onChange={handleChange}
+          className="form-control mb-3"
+          placeholder="Nom du produit"
+        />
+        <input
+          type="number"
+          name="prix"
+          value={form.prix}
+          onChange={handleChange}
+          className="form-control mb-3"
+          placeholder="Prix (€)"
+        />
+        <input
+          type="text"
+          name="url"
+          value={form.url}
+          onChange={handleChange}
+          className="form-control mb-3"
+          placeholder="URL de l'image"
+        />
+        <button type="submit" className="btn btn-warning">Mettre à jour</button>
       </form>
 
-      {message && <div className="alert alert-info mt-3">{message}</div>}
+      {message && <p className="mt-3">{message}</p>}
     </div>
   );
 }

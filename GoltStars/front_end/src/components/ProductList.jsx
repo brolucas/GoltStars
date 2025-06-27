@@ -5,6 +5,7 @@ import axios from "axios";
 export default function ProductList() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -13,20 +14,26 @@ export default function ProductList() {
   useEffect(() => {
     axios.get("https://localhost/api/products")
       .then((res) => {
-        console.error(res.data);
         setProducts(res.data);
         setLoading(false);
       })
       .catch((err) => {
         console.error(err);
-        setError("Erreur de chargement");
+        setError("Erreur de chargement des produits");
         setLoading(false);
+      });
+
+    axios.get("https://localhost/api/categories")
+      .then((res) => {
+        setCategories(res.data); // Format : { 1: "Maillots", 2: "Cartes" }
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Erreur de chargement des catégories");
       });
   }, []);
 
-  const allCategories = Array.from(
-    new Set(products.flatMap((p) => p.categories || []))
-  );
+  const allCategories = Object.values(categories);
 
   const filteredCategories = allCategories.filter((cat) =>
     cat.toLowerCase().includes(categorySearch.toLowerCase())
@@ -44,7 +51,8 @@ export default function ProductList() {
     selectedCategories.length === 0
       ? products
       : products.filter((p) =>
-          selectedCategories.every((cat) => p.categories.includes(cat))
+          p.categories &&
+          p.categories.some((catId) => selectedCategories.includes(categories[catId]))
         );
 
   return (
@@ -69,6 +77,7 @@ export default function ProductList() {
         </p>
       </section>
 
+      {/* Filtrage par catégories */}
       <div className="mb-4">
         <div className="mb-2 d-flex flex-column flex-md-row gap-2 align-items-start align-items-md-center">
           <h6 className="mb-0 text-muted">Filtrer par catégorie :</h6>
@@ -121,18 +130,26 @@ export default function ProductList() {
               >
                 <img
                   src={product.Url
-                  ? product.Url
-                  : "https://via.placeholder.com/300x400?text=Image+non+disponible"}
-                  alt={product.name}
+                    ? product.Url
+                    : "https://via.placeholder.com/300x400?text=Image+non+disponible"}
+                  alt={product.Nom}
                   className="w-100 h-100"
                   style={{ objectFit: "cover" }}
                 />
               </div>
               <div className="card-body d-flex flex-column justify-content-between">
                 <h5 className="card-title text-primary text-center">{product.Nom}</h5>
-                <p className="text-secondary text-center" style={{ fontSize: "0.9rem" }}>
-                  {product.description}
-                </p>
+
+                {product.categories && (
+                  <div className="text-center mb-2">
+                    {product.categories.map((catId) => (
+                      <span key={catId} className="badge bg-light text-dark me-2 border">
+                        {categories[catId] || `Catégorie ${catId}`}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 <p className="text-center text-muted mb-2">
                   <strong>Prix :</strong> {product.Prix} €
                 </p>
