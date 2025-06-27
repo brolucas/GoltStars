@@ -16,13 +16,6 @@ use OpenApi\Annotations as OA;
 
 final class ProduitController extends AbstractController
 {
-    #[Route('/main', name: 'app_main')]
-    public function index(): Response
-    {
-        return $this->render('main/index.html.twig', [
-            'controller_name' => 'MainController',
-        ]);
-    }
 
     #[Route('/api/categorie/{id}', methods: ['GET', 'HEAD'])]
     public function getCategorie(EntityManagerInterface $entityManager, int $id): Response
@@ -50,8 +43,6 @@ final class ProduitController extends AbstractController
            $id = $c->getId();
            $arr[$id] = $Nom;
         }
-        //dd($categorie);
-        //return $categorie;
         return new JsonResponse($arr);
     }
 
@@ -68,7 +59,7 @@ final class ProduitController extends AbstractController
         $produit = $entityManager->getRepository(\App\Entity\Produit::class)->findAll();
         if(!$produit) {
             throw $this->createNotFoundException(
-                'No categories found  '
+                'No products found  '
             );
         }
         $arr = array();
