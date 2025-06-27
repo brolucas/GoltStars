@@ -51,8 +51,10 @@ export default function ProductList() {
     selectedCategories.length === 0
       ? products
       : products.filter((p) =>
-          p.categories &&
-          p.categories.some((catId) => selectedCategories.includes(categories[catId]))
+          p.Categories &&
+          p.Categories.some((cat) =>
+            selectedCategories.includes(cat.nom)
+          )
         );
 
   return (
@@ -140,11 +142,11 @@ export default function ProductList() {
               <div className="card-body d-flex flex-column justify-content-between">
                 <h5 className="card-title text-primary text-center">{product.Nom}</h5>
 
-                {product.categories && (
+                {product.Categories && (
                   <div className="text-center mb-2">
-                    {product.categories.map((catId) => (
-                      <span key={catId} className="badge bg-light text-dark me-2 border">
-                        {categories[catId] || `Catégorie ${catId}`}
+                    {product.Categories.map((cat) => (
+                      <span key={cat.id} className="badge bg-light text-dark me-2 border">
+                        {cat.nom}
                       </span>
                     ))}
                   </div>
