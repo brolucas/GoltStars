@@ -263,4 +263,32 @@ final class ProduitController extends AbstractController
 
         return new JsonResponse(['message' => 'Produit supprimé avec succès'], 204);
     }
+
+    #[Route('/api/products/categorie/{id}', name: 'get_products_by_categorie', methods: ['GET'])]
+    public function getProductsByCategorie(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $categorie = $entityManager->getRepository(Categorie::class)->find($id);
+        if (!$categorie) {
+            return new JsonResponse(['error' => 'Catégorie non trouvée'], 404);
+        }
+        $produits = $categorie->getProduits();
+        $result = [];
+        foreach ($produits as $p) {
+            $cats = [];
+            foreach ($p->getCategories() as $cat) {
+                $cats[] = [
+                    'id' => $cat->getId(),
+                    'nom' => $cat->getNom()
+                ];
+            }
+            $result[] = [
+                'Id' => $p->getId(),
+                'Nom' => $p->getNom(),
+                'Prix' => $p->getPrix(),
+                'Url' => $p->getUrl(),
+                'Categories' => $cats
+            ];
+        }
+        return new JsonResponse($result);
+    }
 }
