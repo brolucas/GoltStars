@@ -66,7 +66,7 @@ export default function ProductList() {
       </button>
 
       <section className="text-center mb-5">
-        <h1 className="display-4 fw-bold">✨ GoltStars – Le prestige sportif</h1>
+        <h1 className="display-4 fw-bold">Le prestige sportif</h1>
         <p className="lead text-muted mx-auto" style={{ maxWidth: "700px" }}>
           Découvrez une sélection unique de cartes, maillots et objets de collection,
           mêlant innovation, beauté et rareté. Chaque pièce raconte une histoire. La vôtre commence ici.
